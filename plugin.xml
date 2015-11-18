@@ -54,6 +54,11 @@
 				android:exported="true"
 				android:permission="com.google.android.c2dm.permission.SEND" >
 			</receiver>
+			<receiver
+				android:exported="true"
+				android:name="com.adobe.phonegap.push.PostAnswerReceiver"
+				android:permission="com.google.android.c2dm.permission.SEND">
+			</receiver>
             <receiver
                 android:name="com.google.android.gms.gcm.GcmReceiver"
                 android:exported="true"
@@ -63,7 +68,14 @@
                     <category android:name="$PACKAGE_NAME" />
                 </intent-filter>
             </receiver>
-            <service
+			<service
+				android:name="com.adobe.phonegap.push.PostAnswerService"
+				android:exported="false">
+				<intent-filter>
+					<category android:name="$PACKAGE_NAME" />
+				</intent-filter>
+			</service>
+			<service
                 android:name="com.adobe.phonegap.push.GCMIntentService"
                 android:exported="false" >
                 <intent-filter>
@@ -86,6 +98,8 @@
 		<source-file src="src/android/com/adobe/phonegap/push/PushConstants.java" target-dir="src/com/adobe/phonegap/push/" />
 		<source-file src="src/android/com/adobe/phonegap/push/PushHandlerActivity.java" target-dir="src/com/adobe/phonegap/push/" />
 		<source-file src="src/android/com/adobe/phonegap/push/CancelButtonReceiver.java" target-dir="src/com/adobe/phonegap/push/" />
+		<source-file src="src/android/com/adobe/phonegap/push/PostAnswerReceiver.java" target-dir="src/com/adobe/phonegap/push/" />
+		<source-file src="src/android/com/adobe/phonegap/push/PostAnswerService.java" target-dir="src/com/adobe/phonegap/push/" />
 		<source-file src="src/android/com/adobe/phonegap/push/PushInstanceIDListenerService.java" target-dir="src/com/adobe/phonegap/push/" />
 		<source-file src="src/android/com/adobe/phonegap/push/PushPlugin.java" target-dir="src/com/adobe/phonegap/push/" />
 

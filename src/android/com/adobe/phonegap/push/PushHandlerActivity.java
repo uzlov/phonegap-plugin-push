@@ -21,6 +21,7 @@ public class PushHandlerActivity extends Activity implements PushConstants {
     public void onCreate(Bundle savedInstanceState) {
         String appName = getIntent().getStringExtra(APP_NAME);
         int notId = getIntent().getIntExtra(NOT_ID, -1);
+        Log.d(LOG_TAG, "PushHandlerActivity notId: " + notId);
 
         GCMIntentService gcm = new GCMIntentService();
         gcm.setNotification(notId, "");

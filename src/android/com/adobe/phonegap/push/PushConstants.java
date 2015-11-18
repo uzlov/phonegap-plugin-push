@@ -51,4 +51,3 @@ public interface PushConstants {
     public static final String FORCE_SHOW = "forceShow";
     public static final String GCM = "GCM";
 }
-

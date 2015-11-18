@@ -196,6 +196,7 @@ public class GCMIntentService extends GcmListenerService implements PushConstant
         Resources resources = context.getResources();
 
         int notId = parseInt(NOT_ID, extras);
+        Log.d(LOG_TAG, "notId: " + notId);
         Intent notificationIntent = new Intent(this, PushHandlerActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         notificationIntent.putExtra(PUSH_BUNDLE, extras);
@@ -303,9 +304,20 @@ public class GCMIntentService extends GcmListenerService implements PushConstant
     private void createActions(String appName, int notId, Bundle extras, NotificationCompat.Builder mBuilder, Resources resources, String packageName) {
         Log.d(LOG_TAG, "create actions");
         String actions = extras.getString(ACTIONS);
+        String typeOfNotification = extras.getString("type");
         PendingIntent pIntent;
+        String servicesToken = "";
+        String answers = extras.getString("answers");
         if (actions != null) {
             try {
+                JSONArray answersArray = new JSONArray(answers);
+                boolean postAnswer = false;
+                if (!PushPlugin.isInForeground() && typeOfNotification.equals("medication")) {
+                    postAnswer = true;
+                    SharedPreferences prefs = getApplicationContext().getSharedPreferences(PushPlugin.COM_ADOBE_PHONEGAP_PUSH, Context.MODE_PRIVATE);
+                    servicesToken = prefs.getString("servicesToken", "");
+                }
+
                 JSONArray actionsArray = new JSONArray(actions);
                 for (int i=0; i < actionsArray.length(); i++) {
                     JSONObject action = actionsArray.getJSONObject(i);
@@ -318,6 +330,20 @@ public class GCMIntentService extends GcmListenerService implements PushConstant
                         cancelButtonIntent.putExtra(NOT_ID, notId);
                         //Create the PendingIntent
                         pIntent = PendingIntent.getBroadcast(this, 0, cancelButtonIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    } else if (postAnswer) {
+                        Log.d(LOG_TAG, "adding postAnswer action");
+                        Log.d(LOG_TAG, "adding answer: " + answersArray.getString(i));
+                        //Create an Intent for the BroadcastReceiver
+                        Intent postAnswerIntent = new Intent(this, PostAnswerReceiver.class);
+                        postAnswerIntent.putExtra(APP_NAME, appName);
+                        postAnswerIntent.putExtra(NOT_ID, notId);
+                        postAnswerIntent.putExtra("servicesUrl", extras.getString("services_url"));
+                        postAnswerIntent.putExtra("servicesToken", servicesToken);
+                        postAnswerIntent.putExtra("answerTid", answersArray.getString(i));
+                        postAnswerIntent.putExtra("questionNid", extras.getString("question"));
+                        postAnswerIntent.putExtra("data", extras.getString("data"));
+                        //Create the PendingIntent
+                        pIntent = PendingIntent.getBroadcast(this, i, postAnswerIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                     } else {
                         Log.d(LOG_TAG, "adding action");
                         Intent intent = new Intent(this, PushHandlerActivity.class);
@@ -592,4 +618,3 @@ public class GCMIntentService extends GcmListenerService implements PushConstant
         return retval;
     }
 }
-
