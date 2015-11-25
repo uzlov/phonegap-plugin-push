@@ -30,13 +30,19 @@ public class PostAnswerService extends IntentService {
             String servicesToken = intent.getStringExtra("servicesToken");
             String questionNid = intent.getStringExtra("questionNid");
             String answerTid = intent.getStringExtra("answerTid");
-            String data = intent.getStringExtra("data");
+            String typeOfNotification = intent.getStringExtra("typeOfNotification");
 
             // Prepare JSON containing the answer message content.
             JSONObject jData = new JSONObject();
             jData.put("question_nid", questionNid);
             jData.put("answer_tid", answerTid);
-            jData.put("data", data);
+            jData.put("type_of_notification", typeOfNotification);
+            if (typeOfNotification.equals("medication")) {
+                String data = intent.getStringExtra("data");
+                jData.put("data", data);
+            } else if (typeOfNotification.equals("appointment")) {
+
+            }
 
             // Create connection to send GCM Message request.
             URL url = new URL(servicesUrl + "/service/patient_answer?services_token=" + servicesToken);

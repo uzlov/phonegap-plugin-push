@@ -15,13 +15,17 @@ public class PostAnswerReceiver extends BroadcastReceiver implements PushConstan
         Log.d(LOG_TAG, "onReceive PostAnswer action");
         String appName = intent.getStringExtra(APP_NAME);
         int notId = intent.getIntExtra(NOT_ID, -1);
+        String typeOfNotification = intent.getStringExtra("typeOfNotification");
 
         Intent PostAnswerService = new Intent(context, PostAnswerService.class);
         PostAnswerService.putExtra("servicesUrl", intent.getStringExtra("servicesUrl"));
         PostAnswerService.putExtra("servicesToken", intent.getStringExtra("servicesToken"));
-        PostAnswerService.putExtra("questionNid", intent.getStringExtra("questionNid"));
         PostAnswerService.putExtra("answerTid", intent.getStringExtra("answerTid"));
-        PostAnswerService.putExtra("data", intent.getStringExtra("data"));
+        PostAnswerService.putExtra("questionNid", intent.getStringExtra("questionNid"));
+        PostAnswerService.putExtra("typeOfNotification", typeOfNotification);
+        if (typeOfNotification.equals("medication")) {
+            PostAnswerService.putExtra("data", intent.getStringExtra("data"));
+        }
         context.startService(PostAnswerService);
 
         // Cancel notification.
@@ -29,3 +33,4 @@ public class PostAnswerReceiver extends BroadcastReceiver implements PushConstan
         notificationManager.cancel(appName, notId);
     }
 }
+

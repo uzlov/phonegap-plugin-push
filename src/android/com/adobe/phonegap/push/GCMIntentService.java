@@ -312,7 +312,7 @@ public class GCMIntentService extends GcmListenerService implements PushConstant
             try {
                 JSONArray answersArray = new JSONArray(answers);
                 boolean postAnswer = false;
-                if (!PushPlugin.isInForeground() && typeOfNotification.equals("medication")) {
+                if ((PushPlugin.isInForeground() && typeOfNotification.equals("medication")) || typeOfNotification.equals("appointment")) {
                     postAnswer = true;
                     SharedPreferences prefs = getApplicationContext().getSharedPreferences(PushPlugin.COM_ADOBE_PHONEGAP_PUSH, Context.MODE_PRIVATE);
                     servicesToken = prefs.getString("servicesToken", "");
@@ -329,7 +329,7 @@ public class GCMIntentService extends GcmListenerService implements PushConstant
                         cancelButtonIntent.putExtra(APP_NAME, appName);
                         cancelButtonIntent.putExtra(NOT_ID, notId);
                         //Create the PendingIntent
-                        pIntent = PendingIntent.getBroadcast(this, 0, cancelButtonIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        pIntent = PendingIntent.getBroadcast(this, notId, cancelButtonIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                     } else if (postAnswer) {
                         Log.d(LOG_TAG, "adding postAnswer action");
                         Log.d(LOG_TAG, "adding answer: " + answersArray.getString(i));
@@ -341,9 +341,12 @@ public class GCMIntentService extends GcmListenerService implements PushConstant
                         postAnswerIntent.putExtra("servicesToken", servicesToken);
                         postAnswerIntent.putExtra("answerTid", answersArray.getString(i));
                         postAnswerIntent.putExtra("questionNid", extras.getString("question"));
-                        postAnswerIntent.putExtra("data", extras.getString("data"));
+                        postAnswerIntent.putExtra("typeOfNotification", typeOfNotification);
+                        if (typeOfNotification.equals("medication")) {
+                            postAnswerIntent.putExtra("data", extras.getString("data"));
+                        }
                         //Create the PendingIntent
-                        pIntent = PendingIntent.getBroadcast(this, i, postAnswerIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        pIntent = PendingIntent.getBroadcast(this, notId * 10 + i, postAnswerIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                     } else {
                         Log.d(LOG_TAG, "adding action");
                         Intent intent = new Intent(this, PushHandlerActivity.class);
@@ -352,7 +355,7 @@ public class GCMIntentService extends GcmListenerService implements PushConstant
                         intent.putExtra(APP_NAME, appName);
                         intent.putExtra(NOT_ID, notId);
                         intent.putExtra(CLOSE_AFTER_CLICK, action.getInt(CLOSE_AFTER_CLICK));
-                        pIntent = PendingIntent.getActivity(this, i, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        pIntent = PendingIntent.getActivity(this, notId * 10 + i, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                     }
 
                     mBuilder.addAction(resources.getIdentifier(action.getString(ICON), DRAWABLE, packageName),
@@ -618,3 +621,4 @@ public class GCMIntentService extends GcmListenerService implements PushConstant
         return retval;
     }
 }
+
