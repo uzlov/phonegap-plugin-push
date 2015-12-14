@@ -312,7 +312,7 @@ public class GCMIntentService extends GcmListenerService implements PushConstant
             try {
                 JSONArray answersArray = new JSONArray(answers);
                 boolean postAnswer = false;
-                if ((PushPlugin.isInForeground() && typeOfNotification.equals("medication")) || typeOfNotification.equals("appointment")) {
+                if ((!PushPlugin.isInForeground() && typeOfNotification.equals("medication")) || typeOfNotification.equals("appointment")) {
                     postAnswer = true;
                     SharedPreferences prefs = getApplicationContext().getSharedPreferences(PushPlugin.COM_ADOBE_PHONEGAP_PUSH, Context.MODE_PRIVATE);
                     servicesToken = prefs.getString("servicesToken", "");
