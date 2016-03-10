@@ -330,7 +330,7 @@ public class GCMIntentService extends GcmListenerService implements PushConstant
                         cancelButtonIntent.putExtra(NOT_ID, notId);
                         //Create the PendingIntent
                         pIntent = PendingIntent.getBroadcast(this, notId, cancelButtonIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    } else if (postAnswer) {
+                    } else if (postAnswer && !action.getString(CALLBACK).equals("onAnswerMedicationsNo")) {
                         Log.d(LOG_TAG, "adding postAnswer action");
                         Log.d(LOG_TAG, "adding answer: " + answersArray.getString(i));
                         //Create an Intent for the BroadcastReceiver
